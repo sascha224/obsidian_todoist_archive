@@ -68,7 +68,7 @@ weist auf das nötige Update hin.
    dort einfügen.
 3. Optional: Überschrift, Zeilen-Vorlage und Projekt-Filter anpassen.
 
-**Zur Sicherheit, ohne Beschönigung:**
+**Security
 - In den Plugin-Einstellungen (`data.json`) steht nur noch der *Name* des
   Secrets, nicht mehr der Tokenwert selbst.
 - Der eigentliche Wert liegt in Obsidians Keychain, die Chromium/Electron
