@@ -1,0 +1,10 @@
+{
+  "id": "todoist-daily-archive",
+  "name": "Todoist Daily Archive",
+  "version": "1.5.0",
+  "minAppVersion": "1.11.4",
+  "description": "Archiviert erledigte Todoist-Tasks in der zum Task-Datum passenden Daily Note. Token wird in der Obsidian-Keychain gespeichert.",
+  "author": "Sascha",
+  "authorUrl": "",
+  "isDesktopOnly": false
+}
