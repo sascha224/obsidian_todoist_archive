@@ -1,114 +1,114 @@
-# Todoist Daily Archive (Obsidian Plugin)
+# Todoist Daily Archive
 
-Archiviert erledigte Todoist-Tasks in der zum jeweiligen Tag passenden Daily Note.
+An Obsidian plugin that archives your completed Todoist tasks into the daily
+note matching each task's completion date.
 
-## Funktionsweise
+## Features
 
-- Nutzt die neue, vereinheitlichte Todoist-API (`api.todoist.com/api/v1`), konkret
-  `GET /tasks/completed/by_completion_date`. Die alte Sync-API (`sync/v9`) wird
-  nicht mehr verwendet.
-- Ermittelt aus dem Dateinamen der aktuell geöffneten Note das Datum (über das
-  Format des Core-Plugins "Tägliche Notiz" bzw. "Periodic Notes"; alternativ
-  manuell in den Plugin-Einstellungen überschreibbar).
-- Holt alle an diesem Kalendertag (lokale Zeitzone) erledigten Tasks und fügt sie
-  unter einer konfigurierbaren Überschrift in die Note ein.
-- Überschriftsebene (# bis ######) und -text sind getrennt konfigurierbar.
-  Existiert bereits eine Überschrift mit exakt diesem Text **auf genau dieser
-  Ebene**, wird an deren Abschnittsende angehängt - also bis zur nächsten
-  Überschrift gleicher oder höherer Rangstufe (weniger oder gleich viele #),
-  nicht bis zur nächsten Überschrift generell. Eine gleichlautende Überschrift
-  auf einer anderen Ebene wird bewusst ignoriert und keine bestehende Struktur
-  verändert. Existiert die Überschrift noch gar nicht, wird sie am Ende der
-  Datei neu angelegt.
-- Funktioniert auch, wenn die Überschrift in einem Callout steht (z. B.
-  `> [!done]+ Todoist` gefolgt von `> ## Erledigt (Todoist)`). Neue Zeilen
-  bekommen automatisch denselben `>`-Präfix, damit sie optisch im Callout
-  bleiben. Der Abschnitt endet dabei zusätzlich spätestens dort, wo der
-  Blockquote selbst aufhört (erste Zeile ohne führendes `>`), nicht erst bei
-  der nächsten Überschrift außerhalb des Callouts.
-- Jede Zeile verlinkt per `{url}`-Platzhalter direkt zum jeweiligen Task in
-  Todoist (Web-App). Genutzt wird das `url`-Feld, das Todoist pro Task
-  mitliefert; fehlt es ausnahmsweise, wird ersatzweise
-  `https://app.todoist.com/app/task/<id>` verwendet. Bereits bestehende
-  Installationen mit unverändertem alten Zeilen-Format werden beim ersten
-  Start automatisch auf die neue, verlinkte Vorlage angehoben - individuell
-  angepasste Vorlagen werden dabei nicht angerührt.
-- Zwischen der Überschrift und dem darunterliegenden Inhalt wird immer genau
-  eine Leerzeile sichergestellt (einmalig eingefügt, falls sie fehlt - kein
-  Aufsummieren bei mehrfachem Archivieren). Steht die Überschrift in einem
-  Callout, ist diese "Leerzeile" selbst eine Callout-Zeile mit `>`-Präfix ohne
-  Inhalt, damit der Callout dadurch nicht vorzeitig endet.
-- Jede eingefügte Zeile bekommt eine versteckte HTML-Kommentar-Markierung
-  (`<!--todoist-id:12345-->`), damit beim erneuten Ausführen keine Duplikate
-  entstehen.
+- Uses Todoist's current unified API (`api.todoist.com/api/v1`), specifically
+  `GET /tasks/completed/by_completion_date`. Does not rely on the legacy Sync
+  API (`sync/v9`).
+- Detects the date from the filename of the active note, using the format
+  configured in the core "Daily notes" plugin or the "Periodic Notes"
+  community plugin (with a manual override available in settings).
+- Fetches all tasks completed on that calendar day (local timezone) and
+  inserts them under a configurable heading.
+- Heading level (`#` to `######`) and heading text are configured separately.
+  If a heading with exactly this text already exists **at exactly this
+  level**, new tasks are appended at the end of that section - i.e. up to the
+  next heading of equal or higher rank (fewer or equal `#`), not just the next
+  heading in general. A heading with the same text but a different level is
+  deliberately ignored, so the plugin never rewrites structure it doesn't
+  recognize. If the heading doesn't exist yet, it's created at the end of the
+  file.
+- Works even when the heading lives inside a callout (e.g. `> [!done]+
+  Todoist` followed by `> ## Completed (Todoist)`). New lines automatically
+  get the same `>` prefix so they stay visually inside the callout. The
+  section additionally ends wherever the blockquote itself ends (the first
+  line without a leading `>`), not only at the next heading outside it.
+- A blank line is always ensured directly under the heading (inserted once if
+  missing, left alone if already present - no accumulation on repeated runs).
+  Inside a callout, that blank line is itself a callout line (`>` with no
+  content), so the callout isn't cut short.
+- Each line links to the corresponding task in Todoist via the `{url}`
+  placeholder, using the `url` field Todoist returns per task (falling back to
+  `https://app.todoist.com/app/task/<id>` if that field is ever missing).
+- Each inserted line carries a hidden HTML comment marker
+  (`<!--todoist-id:12345-->`) so re-running the command never creates
+  duplicates.
 
-## Installation (manuell, ohne Community-Plugin-Store)
+## Requirements
 
-1. Im Vault-Ordner: `.obsidian/plugins/todoist-daily-archive/` anlegen.
-2. `main.js` und `manifest.json` aus diesem Paket dorthin kopieren.
-3. Obsidian neu laden (Strg/Cmd+R) oder Vault neu öffnen.
-4. Einstellungen -> Community Plugins -> "Todoist Daily Archive" aktivieren.
-   (Ggf. vorher "Restricted Mode" / eingeschränkten Modus deaktivieren, da es
-   sich um ein nicht im Store gelistetes Plugin handelt.)
+Requires Obsidian **>= 1.11.4** (desktop and mobile), because the plugin
+stores the API token via Obsidian's native keychain feature (`SecretStorage` /
+`SecretComponent`), which was only introduced in that version. On older
+versions the plugin intentionally does not fall back to a plaintext input
+field; it will tell you to update instead.
 
-## Voraussetzung
+## Installation
 
-Erfordert Obsidian **≥ 1.11.4** (Desktop und Mobile), da das Plugin das Token
-über die native Keychain-Funktion (`SecretStorage`/`SecretComponent`) ablegt,
-die Obsidian erst seit dieser Version bereitstellt. Ist die Version älter,
-blendet das Plugin bewusst kein Klartext-Eingabefeld als Fallback ein, sondern
-weist auf das nötige Update hin.
+Manual installation (not distributed via the Community Plugins browser):
 
-## Einrichtung
+1. In your vault: create `.obsidian/plugins/todoist-daily-archive/`.
+2. Copy `main.js` and `manifest.json` from this repository into that folder.
+3. Reload Obsidian (Ctrl/Cmd+R) or reopen the vault.
+4. Settings -> Community plugins -> enable "Todoist Daily Archive".
+   (You may need to turn off restricted mode first, since this plugin isn't
+   listed in the store.)
 
-1. In Todoist: Einstellungen -> Integrationen -> Entwickler -> API-Token
-   kopieren.
-2. In Obsidian: Einstellungen -> Todoist Daily Archive -> beim Feld
-   "Todoist API Token" über die Auswahl ein neues Secret anlegen und den Token
-   dort einfügen.
-3. Optional: Überschrift, Zeilen-Vorlage und Projekt-Filter anpassen.
+## Setup
 
-**Security
-- In den Plugin-Einstellungen (`data.json`) steht nur noch der *Name* des
-  Secrets, nicht mehr der Tokenwert selbst.
-- Der eigentliche Wert liegt in Obsidians Keychain, die Chromium/Electron
-  `safeStorage` nutzt (macOS Keychain, Windows Credential Manager, Linux
-  Secret Service je nach Distribution) und lokal je Vault gespeichert wird -
-  er wird also nicht über Obsidian Sync/iCloud/Git mit synchronisiert.
-- Diese Keychain-API ist mit Obsidian 1.11.4 (Anfang 2026) neu eingeführt
-  worden. Aus einem Community-Bugreport aus der Frühphase ging hervor, dass
-  Secrets zumindest zeitweise noch nicht vollständig verschlüsselt, sondern in
-  Local Storage abgelegt wurden. Ob das inzwischen behoben ist, konnte ich
-  nicht abschließend verifizieren - es ist in jedem Fall eine deutliche
-  Verbesserung gegenüber Klartext in `data.json`, aber kein Ersatz für ein
-  separates Secret-Management, falls das für dich relevant ist.
-- Ältere Installationen dieses Plugins mit Klartext-Token in `data.json`
-  werden beim ersten Start automatisch in die Keychain migriert, sofern
-  Obsidian ≥ 1.11.4 läuft; der Klartextwert wird danach aus `data.json`
-  gelöscht.
+1. In Todoist: Settings -> Integrations -> Developer -> copy your API token.
+2. In Obsidian: Settings -> Todoist Daily Archive -> under "Todoist API
+   token", create a new secret via the picker and paste the token in.
+3. Optionally adjust the heading, line template, and project filter.
 
-## Bedienung
+**On security, plainly stated:**
+- The plugin settings (`data.json`) only ever contain the *name* of the
+  secret, never the token value.
+- The actual value lives in Obsidian's keychain, which uses Chromium/Electron
+  `safeStorage` (macOS Keychain, Windows Credential Manager, Linux Secret
+  Service depending on distro) and is stored per-vault locally - it is not
+  synced via Obsidian Sync/iCloud/Git.
+- This keychain API is fairly new (introduced in Obsidian 1.11.4, early 2026).
+  An early community bug report suggested secrets were, at least for a while,
+  not fully encrypted at rest but kept in local storage instead. Whether
+  that's been fixed since could not be conclusively verified here - it's a
+  clear improvement over plaintext in `data.json` either way, but not a
+  substitute for a dedicated secrets manager if that matters to you.
+- Older installations with a plaintext token in `data.json` are automatically
+  migrated into the keychain on first load (once Obsidian is >= 1.11.4); the
+  plaintext value is then deleted from `data.json`.
 
-- Befehl **"Erledigte Todoist-Tasks in aktuelle Daily Note archivieren"**:
-  archiviert alle Tasks, die am Datum der aktuell geöffneten Note erledigt
-  wurden, in eben diese Note.
-- Befehl **"Erledigte Todoist-Tasks von gestern in gestriges Daily Note
-  archivieren"**: praktisch für einen morgendlichen Rückblick, sucht die
-  gestrige Daily Note im Vault (auch wenn sie nicht gerade geöffnet ist).
+## Usage
 
-Beide Befehle über die Befehlspalette (Strg/Cmd+P) aufrufbar, oder man legt sich
-per Obsidian-eigenen Hotkey-Einstellungen ein Tastenkürzel an.
+- Command **"Archive completed Todoist tasks into current daily note"**:
+  archives every task completed on the date of the currently active note,
+  into that same note.
+- Command **"Archive yesterday's completed Todoist tasks into yesterday's
+  daily note"**: useful for a morning review; looks up yesterday's daily note
+  in the vault even if it isn't currently open.
+- Command **"Diagnose: show detected daily note format"**: shows which source
+  was detected (core plugin / Periodic Notes / override / none), the
+  resulting date format and folder, the active file's name, and whether it
+  matches.
 
-## Bekannte Grenzen
+All commands are available via the command palette (Ctrl/Cmd+P), and can be
+bound to hotkeys through Obsidian's normal hotkey settings.
 
-- Die Todoist-API liefert Completed-Tasks pro Abfrage für maximal 3 Monate
-  zurück (Endpoint-Limit von Todoist selbst) - für den täglichen Gebrauch
-  irrelevant.
-- Es wird keine automatische Ausführung beim Öffnen einer Note eingebaut
-  (bewusst, um keine unerwarteten Schreibzugriffe/API-Calls im Hintergrund zu
-  erzeugen). Beide Befehle sind manuell auszulösen bzw. lassen sich über
-  Hotkeys oder den Community-Plugin "Commander"/Templater-Automatisierungen
-  anstoßen.
-- Rekurrierende Tasks: Todoist meldet pro Abschluss-Ereignis einen eigenen
-  Completed-Eintrag inkl. `completed_at`; das Plugin dedupliziert nur über die
-  Task-ID des jeweiligen Completion-Eintrags, nicht über die Basis-Task.
+## Known limitations
+
+- Todoist's API returns completed tasks for a maximum lookback of about 3
+  months per query (a limit of the endpoint itself) - irrelevant for daily
+  use.
+- There's no automatic execution on note-open (deliberately, to avoid
+  unexpected background writes/API calls). Both archiving commands must be
+  triggered manually, via a hotkey, or through automation plugins like
+  Commander or Templater.
+- Recurring tasks: Todoist reports a separate completed entry (with its own
+  `completed_at`) per completion event; deduplication is based on that
+  completion entry's task ID, not the recurring task's base ID.
+
+## License
+
+MIT, see [LICENSE](LICENSE).
